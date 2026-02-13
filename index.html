@@ -22,7 +22,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            visibility: hidden; /* 在輸入密碼前完全隱藏畫面 */
+            visibility: hidden; /* 確保輸入密碼前畫面空白 */
         }
 
         .container {
@@ -91,60 +91,64 @@
 </head>
 <body>
 
-<div class="container" id="main-content">
+<div class="container">
     <h1>🌲 LUMI'S FOREST 🌲</h1>
     
-    <div class="progress-text" id="assets-label">數據連線中...</div>
+    <div class="progress-text" id="assets-label">連線中...</div>
     <div class="forest-box" id="forest-display">🌱</div>
 
     <div class="pool-container">
         <div id="water-level" class="water" style="height: 0%;"></div>
     </div>
-    <div class="cash-status" id="cash-status">讀取儲水池水位...</div>
+    <div class="cash-status" id="cash-status">讀取儲水池...</div>
 
     <div class="advice-box" id="daily-advice">正在接收市場頻率...</div>
     <div id="status-msg"></div>
 </div>
 
 <script>
-    // 🔐 設定
-    const MY_PASSWORD = "lumi080601"; // 請自行更改
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnKIlc9Lf9PxSlb83nV1Wny7fC0EhKpy9iR41mMRqnLDepRpWwz8qyiIWaDEjY0TWaGLROfzeKbHG/pub?gid=768557640&single=true&output=csv"; // 請換上你的網址，務必保留雙引號
+    // 🔐 配置區
+    const MY_PASSWORD = "lumi080601"; // <-- 請修改密碼
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnKIlc9Lf9PxSlb83nV1Wny7fC0EhKpy9iR41mMRqnLDepRpWwz8qyiIWaDEjY0TWaGLROfzeKbHG/pub?gid=768557640&single=true&output=csv"; // <-- 請修改網址，務必保留雙引號
 
-    function startApp() {
+    function checkAuth() {
         const userInput = prompt("請輸入通往 Lumi 森林的密碼：");
-        
         if (userInput === MY_PASSWORD) {
             document.body.style.visibility = "visible";
             fetchData();
         } else {
-            alert("密碼錯誤！");
-            window.location.reload(); 
+            alert("密碼錯誤，請重新整理網頁。");
+            document.body.innerHTML = "<h2 style='text-align:center;color:#bbb;margin-top:50px;'>🔒 私密森林</h2>";
+            document.body.style.visibility = "visible";
         }
     }
 
     async function fetchData() {
         try {
-            const response = await fetch(csvUrl);
-            if (!response.ok) throw new Error("數據抓取失敗");
+            // 避免快取問題，在網址後加上時間戳記
+            const response = await fetch(csvUrl + "&t=" + new Date().getTime());
+            if (!response.ok) throw new Error("Fetch Failed");
             
             const rawData = await response.text();
             const rows = rawData.split(/\r?\n/).map(row => 
                 row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim())
             );
 
-            // 讀取並轉換數值，避免 NaN 出現
-            const parseVal = (val) => parseFloat(String(val).replace(/,/g, '')) || 0;
+            // 數值清洗：移除所有非數字字符（除了小數點）
+            const cleanNum = (val) => {
+                const n = parseFloat(String(val).replace(/[^\d.-]/g, ''));
+                return isNaN(n) ? 0 : n;
+            };
 
-            const assets = parseVal(rows[0][1]);
-            const goal = parseVal(rows[1][1]);
-            const cash = parseVal(rows[2][1]);
-            const monthly = parseVal(rows[3][1]);
-            const advice = rows[4][1] || "持續定期定額中";
+            const assets = cleanNum(rows[0][1]);
+            const goal = cleanNum(rows[1][1]);
+            const cash = cleanNum(rows[2][1]);
+            const monthly = cleanNum(rows[3][1]);
+            const advice = rows[4][1] || "持續前進中";
 
             render(assets, goal, cash, monthly, advice);
         } catch (e) {
-            document.getElementById('status-msg').innerText = "連線失敗，請檢查 GitHub 部署狀態。";
+            document.getElementById('status-msg').innerText = "數據讀取失敗，請確認 Google Sheets 已發布。";
         }
     }
 
@@ -165,7 +169,7 @@
         document.getElementById('status-msg').innerText = "最後更新: " + new Date().toLocaleTimeString();
     }
 
-    startApp();
+    checkAuth();
 </script>
 
 </body>
