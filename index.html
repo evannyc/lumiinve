@@ -3,133 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumi's Watercolor Orchard</title>
+    <title>Lumi's Asset Forest</title>
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-watercolor: #fdfaf5;
-            --text-color: #5a5a5a;
-            --sign-wood: #8d6e63;
+            --text-color: #4a4a4a;
+            --fountain-blue: rgba(162, 210, 255, 0.6);
         }
 
         /* 景氣燈號色彩連動 */
-        body.light-藍燈 { --bg-watercolor: #eef7ff; }
-        body.light-黃藍燈 { --bg-watercolor: #f0fbff; }
-        body.light-綠燈 { --bg-watercolor: #f7fbf2; }
-        body.light-黃紅燈 { --bg-watercolor: #fff9f0; }
-        body.light-紅燈 { --bg-watercolor: #fff5f5; }
+        body.light-藍燈 { --bg-watercolor: #f0f7ff; }
+        body.light-黃藍燈 { --bg-watercolor: #f5fcff; }
+        body.light-綠燈 { --bg-watercolor: #f9fdf5; }
+        body.light-黃紅燈 { --bg-watercolor: #fffaf0; }
+        body.light-紅燈 { --bg-watercolor: #fff7f7; }
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: var(--bg-watercolor);
-            background-image: url('https://www.transparenttextures.com/patterns/handmade-paper.png');
-            color: var(--text-color);
-            margin: 0; min-height: 100vh;
+            margin: 0; padding: 0;
             display: flex; justify-content: center; align-items: center;
-            transition: background-color 2s ease;
+            min-height: 100vh; transition: background 2s ease;
             visibility: hidden;
+            background-image: url('https://www.transparenttextures.com/patterns/handmade-paper.png');
         }
 
-        .container { width: 95%; max-width: 900px; text-align: center; }
+        .container { width: 95%; max-width: 1000px; text-align: center; position: relative; }
 
+        /* 書法標題 */
         h1 {
             font-family: 'ZCOOL XiaoWei', serif;
-            font-size: 3.5rem; margin: 0; letter-spacing: 12px;
-            color: #3e4a42; text-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+            font-size: 3.8rem; margin: 0; letter-spacing: 10px;
+            color: #2f3e35; text-shadow: 3px 3px 6px rgba(0,0,0,0.05);
         }
 
-        /* --- 景觀生態區 --- */
-        .ecosystem {
-            display: flex; align-items: flex-end; height: 400px;
-            margin: 30px 0; position: relative;
-            background: rgba(255,255,255,0.2); border-radius: 100px 100px 20px 20px;
-        }
+        .stats-summary { font-size: 14px; opacity: 0.6; margin-top: -10px; margin-bottom: 20px; }
 
-        /* --- 噴水池 --- */
-        .fountain-area { width: 180px; text-align: center; padding-bottom: 20px; }
-        .fountain-base {
-            width: 140px; height: 45px; background: #e0e0e0;
-            border-radius: 50%; margin: 0 auto; border: 4px solid #fff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        .water-column {
-            width: 6px; background: rgba(162, 210, 255, 0.7);
-            margin: 0 auto; border-radius: 10px;
-            transition: height 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* --- 景觀區佈局 --- */
+        .landscape {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            height: 500px; padding: 40px; border-radius: 80px;
+            background: rgba(255,255,255,0.25);
+            box-shadow: inset 0 0 100px rgba(255,255,255,0.5);
             position: relative;
         }
-        .water-crown {
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 30px; height: 20px; background: rgba(202, 240, 248, 0.5);
-            border-radius: 50%; filter: blur(5px); animation: splash 1.5s infinite;
-        }
-        @keyframes splash { 0%, 100% { transform: translate(-50%, 0) scale(1); } 50% { transform: translate(-50%, -15px) scale(1.3); } }
 
-        /* --- 隨機森林畫布 --- */
-        .orchard-canvas { flex-grow: 1; height: 100%; position: relative; overflow: hidden; }
-        .tree-container { position: absolute; transition: all 1s ease; cursor: help; }
+        /* --- 改良噴水池 --- */
+        .fountain-wrapper { width: 200px; text-align: center; }
+        .fountain-pool {
+            width: 160px; height: 50px; background: rgba(255,255,255,0.5);
+            border: 2px solid #e0e0e0; border-radius: 50%; margin: 0 auto;
+            position: relative; filter: url(#watercolor);
+        }
+        .water-column {
+            width: 8px; background: var(--fountain-blue); margin: 0 auto;
+            border-radius: 10px; transition: height 2s ease; position: relative;
+            filter: blur(1px);
+        }
+        .fountain-text { font-size: 12px; margin-top: 15px; color: #7b9acc; font-weight: 500; }
+
+        /* --- 果樹區 (解決重疊) --- */
+        .orchard {
+            flex-grow: 1; height: 100%; display: flex;
+            align-items: flex-end; justify-content: center; gap: 20px;
+        }
+        .tree-item {
+            position: relative; display: flex; flex-direction: column; align-items: center;
+            transition: transform 0.3s ease;
+        }
+        .tree-item:nth-child(even) { transform: translateY(-30px); } /* 交錯高度避免標籤重疊 */
+
+        .tree-svg { filter: url(#watercolor); cursor: pointer; }
         
-        .stock-tag {
-            background: rgba(255,255,255,0.85); padding: 5px 10px;
-            border-radius: 12px; font-size: 12px; border: 1px solid #eee;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.03); white-space: nowrap;
+        .stock-label {
+            background: rgba(255,255,255,0.9); padding: 6px 12px;
+            border-radius: 15px; font-size: 11px; white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee;
+            margin-top: 10px; pointer-events: none;
         }
-        .fertilize-alert { color: #e63946; font-weight: bold; margin-left: 5px; animation: glow 1s infinite alternate; }
-        @keyframes glow { from { opacity: 0.4; } to { opacity: 1; } }
+        .fertilize-dot { display: inline-block; width: 8px; height: 8px; background: #ff6b6b; border-radius: 50%; margin-right: 5px; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* --- 森林告示牌 --- */
-        .signpost {
-            background: var(--sign-wood); color: #fff;
-            padding: 15px 40px; border-radius: 4px; border: 2px solid #fff;
-            box-shadow: 0 8px 0 #5d4037, 0 15px 20px rgba(0,0,0,0.1);
-            position: relative; display: inline-block; margin-top: 20px;
-            font-size: 1.1rem; line-height: 1.6;
+        /* --- 寫實告示牌 --- */
+        .signpost-container { margin-top: 40px; position: relative; }
+        .wood-sign {
+            background: #8d6e63; color: #fff; padding: 20px 50px;
+            border-radius: 10px; font-size: 1.2rem; display: inline-block;
+            box-shadow: 0 10px 0 #5d4037, 0 20px 30px rgba(0,0,0,0.1);
+            border: 3px solid #fdfaf5; position: relative;
+            max-width: 80%; line-height: 1.6; filter: url(#watercolor);
         }
-        .signpost::before { content: "||"; position: absolute; top: 100%; left: 20%; color: #5d4037; font-weight: bold; }
-        .signpost::after { content: "||"; position: absolute; top: 100%; right: 20%; color: #5d4037; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1 id="main-title">Lumi 成長森林</h1>
-    <p id="progress-info" style="font-size: 14px; opacity: 0.6;">正在與大地連線...</p>
+<svg style="position: absolute; width: 0; height: 0;">
+    <filter id="watercolor">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+    </filter>
+</svg>
 
-    <div class="ecosystem">
-        <div class="fountain-area">
-            <div id="fountain-stream" class="water-column" style="height: 20px;">
-                <div class="water-crown"></div>
-            </div>
-            <div class="fountain-base"></div>
-            <p style="font-size: 11px; margin-top: 8px;">銀行餘額噴泉</p>
+<div class="container">
+    <h1>Lumi's Asset Forest</h1>
+    <div class="stats-summary" id="stats-summary">正在讀取森林數據...</div>
+
+    <div class="landscape">
+        <div class="fountain-wrapper">
+            <div id="fountain-stream" class="water-column" style="height: 0px;"></div>
+            <div class="fountain-pool"></div>
+            <div class="fountain-text" id="cash-status">計算餘額水位中...</div>
         </div>
 
-        <div class="orchard-canvas" id="orchard-canvas"></div>
+        <div class="orchard" id="orchard"></div>
     </div>
 
-    <div class="signpost" id="daily-guide">讀取森林指引中...</div>
+    <div class="signpost-container">
+        <div class="wood-sign" id="daily-guide">讀取森林指引中...</div>
+    </div>
 </div>
 
 <script>
     const MY_PASSWORD = "lumi2026"; 
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnKIlc9Lf9PxSlb83nV1Wny7fC0EhKpy9iR41mMRqnLDepRpWwz8qyiIWaDEjY0TWaGLROfzeKbHG/pub?gid=768557640&single=true&output=csv"; 
 
-    // 果樹插畫資源 (SVG)
     const fruitTrees = {
-        apple: `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="30" fill="#a8d5ba"/><circle cx="40" cy="30" r="4" fill="#ff4d4d"/><circle cx="60" cy="45" r="4" fill="#ff4d4d"/><rect x="46" y="70" width="8" height="20" fill="#795548"/></svg>`,
-        orange: `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="30" fill="#cdeac0"/><circle cx="45" cy="45" r="5" fill="#ffa500"/><circle cx="65" cy="35" r="5" fill="#ffa500"/><rect x="46" y="70" width="8" height="20" fill="#795548"/></svg>`,
-        peach: `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="32" fill="#ffcad4"/><circle cx="45" cy="40" r="4" fill="#ff8fab"/><rect x="47" y="72" width="6" height="18" fill="#5d4037"/></svg>`,
-        default: `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="28" fill="#d8e2dc"/><rect x="47" y="68" width="6" height="22" fill="#8d6e63"/></svg>`
+        apple: `<svg class="tree-svg" width="100%" height="100%" viewBox="0 0 100 120"><path d="M50 100 L50 115" stroke="#795548" stroke-width="6"/><path d="M50 20 C20 20 15 80 50 90 C85 80 80 20 50 20" fill="#a8d5ba"/><circle cx="35" cy="45" r="5" fill="#ff4d4d"/><circle cx="65" cy="55" r="5" fill="#ff4d4d"/><circle cx="50" cy="70" r="5" fill="#ff4d4d"/></svg>`,
+        orange: `<svg class="tree-svg" width="100%" height="100%" viewBox="0 0 100 120"><path d="M50 100 L50 115" stroke="#795548" stroke-width="6"/><path d="M50 15 C10 15 10 85 50 95 C90 85 90 15 50 15" fill="#cdeac0"/><circle cx="40" cy="40" r="6" fill="#ffa500"/><circle cx="60" cy="60" r="6" fill="#ffa500"/></svg>`,
+        peach: `<svg class="tree-svg" width="100%" height="100%" viewBox="0 0 100 120"><path d="M50 100 L50 115" stroke="#5d4037" stroke-width="6"/><path d="M50 25 C25 25 20 85 50 95 C80 85 75 25 50 25" fill="#ffcad4"/><circle cx="45" cy="50" r="6" fill="#ff8fab"/><circle cx="65" cy="40" r="6" fill="#ff8fab"/></svg>`,
+        default: `<svg class="tree-svg" width="100%" height="100%" viewBox="0 0 100 120"><path d="M50 100 L50 115" stroke="#8d6e63" stroke-width="4"/><path d="M50 30 C30 30 30 90 50 95 C70 90 70 30 50 30" fill="#d8e2dc"/></svg>`
     };
 
-    function start() {
-        const pass = prompt("請輸入通往森林的密碼：");
-        if (pass === MY_PASSWORD) { document.body.style.visibility = "visible"; load(); }
+    function init() {
+        const pass = prompt("請輸入密碼以開啟森林畫卡：");
+        if (pass === MY_PASSWORD) { document.body.style.visibility = "visible"; loadData(); }
         else { window.location.reload(); }
     }
 
-    async function load() {
+    async function loadData() {
         try {
             const resp = await fetch(csvUrl + "&t=" + Date.now());
             const text = await resp.text();
@@ -152,30 +165,33 @@
     function render(d) {
         document.body.className = `light-${d.light}`;
         document.getElementById('daily-guide').innerText = d.advice;
-        document.getElementById('progress-info').innerText = `目前進度：${((d.assets/d.goal)*100).toFixed(1)}% ｜ 森林總價值：${d.assets.toLocaleString()} 元`;
+        document.getElementById('stats-summary').innerText = `Progress: ${((d.assets/d.goal)*100).toFixed(1)}% | Current Value: $${d.assets.toLocaleString()}`;
 
-        // 更新噴水池
-        const height = Math.min((d.cash / (d.monthly * 3)) * 250, 300);
-        document.getElementById('fountain-stream').style.height = height + "px";
+        // 噴水池與支應月數文字
+        const months = (d.cash / d.monthly).toFixed(1);
+        const fHeight = Math.min((months / 6) * 300, 350);
+        document.getElementById('fountain-stream').style.height = fHeight + "px";
+        document.getElementById('cash-status').innerText = `現金餘額可支應 ${months} 個月`;
 
-        // 繪製隨機森林
-        const canvas = document.getElementById('orchard-canvas');
-        canvas.innerHTML = '';
+        // 繪製交錯果樹林
+        const orchard = document.getElementById('orchard');
+        orchard.innerHTML = '';
         d.stocks.forEach((s, i) => {
-            const div = document.createElement('div');
-            div.className = 'tree-container';
-            div.style.left = (10 + (Math.random() * 70)) + '%';
-            div.style.bottom = (5 + (Math.random() * 15)) + '%';
-            
-            const size = 70 + (s.val / d.assets) * 200;
-            div.innerHTML = `
+            const size = 100 + (s.val / d.assets) * 250;
+            const item = document.createElement('div');
+            item.className = 'tree-item';
+            item.innerHTML = `
                 <div style="width:${size}px; height:${size}px;">${fruitTrees[s.type] || fruitTrees.default}</div>
-                <div class="stock-tag">${s.name}: ${s.val.toLocaleString()} ${s.alert ? '<span class="fertilize-alert">✨需施肥</span>' : ''}</div>
+                <div class="stock-label">
+                    ${s.alert ? '<span class="fertilize-dot"></span>' : ''}
+                    ${s.name}: ${s.val.toLocaleString()}
+                </div>
             `;
-            canvas.appendChild(div);
+            orchard.appendChild(item);
         });
     }
-    start();
+
+    init();
 </script>
 </body>
 </html>
