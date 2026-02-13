@@ -3,172 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumi 的成長森林</title>
+    <title>Lumi's Watercolor Forest</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #fdfaf5; 
-            --forest-green: #cdeac0; 
-            --water-blue: #bde0fe; 
-            --accent-pink: #ffcad4; 
-            --text-color: #8b8589; 
+            /* 預設綠燈色調 (春秋) */
+            --bg-watercolor: #f5f9f2;
+            --accent-color: #a8d5ba;
+            --text-color: #6d7a71;
         }
 
+        /* 景氣燈號動態色彩 */
+        body.light-藍燈 { --bg-watercolor: #eef7ff; --accent-color: #a2d2ff; }
+        body.light-黃藍燈 { --bg-watercolor: #f0fbff; --accent-color: #caf0f8; }
+        body.light-綠燈 { --bg-watercolor: #f7fbf2; --accent-color: #d8e2dc; }
+        body.light-黃紅燈 { --bg-watercolor: #fff9f0; --accent-color: #ffead0; }
+        body.light-紅燈 { --bg-watercolor: #fff5f5; --accent-color: #ffcad4; }
+
         body {
-            font-family: "Hiragino Sans GB", "Microsoft JhengHei", sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-watercolor);
             color: var(--text-color);
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            visibility: hidden; /* 確保輸入密碼前畫面空白 */
+            overflow-x: hidden;
+            transition: background-color 2s ease;
+            visibility: hidden; /* 密碼輸入前隱藏 */
+        }
+
+        /* 水彩紋理遮罩 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/handmade-paper.png');
+            opacity: 0.3;
+            pointer-events: none;
         }
 
         .container {
-            width: 90%;
-            max-width: 480px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 40px 25px;
-            border-radius: 45px;
-            box-shadow: 0 20px 40px rgba(220, 210, 200, 0.3);
+            width: 95%;
+            max-width: 600px;
             text-align: center;
-            border: 2px solid #ffffff;
+            z-index: 1;
         }
 
-        h1 { color: var(--accent-pink); font-size: 20px; letter-spacing: 3px; margin-bottom: 30px; }
-
-        .forest-box {
-            background: #f8fbf9;
-            padding: 35px 15px;
-            border-radius: 30px;
-            margin: 20px 0;
-            min-height: 130px;
-            font-size: 42px;
-            line-height: 1.6;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            border: 2px dashed #e8f3ee;
+        h1 {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 2.2rem;
+            color: var(--text-color);
+            margin-bottom: 5px;
+            letter-spacing: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
         }
 
-        .pool-container {
-            width: 70px;
-            height: 110px;
-            border: 3px solid #f0f0f0;
-            border-radius: 12px 12px 35px 35px;
-            margin: 20px auto;
+        /* --- 森林畫布區 --- */
+        .forest-canvas {
+            width: 100%;
+            height: 350px;
             position: relative;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 60% 40% 70% 30% / 30% 60% 40% 70%; /* 不規則水彩斑塊感 */
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(255,255,255,0.8);
+        }
+
+        .tree-icon, .sprout-icon {
+            position: absolute;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.05));
+        }
+
+        /* --- 森林告示牌 --- */
+        .signpost {
+            position: relative;
+            background: #967259; /* 木頭色 */
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 5px;
+            margin: 30px auto 0;
+            width: fit-content;
+            max-width: 80%;
+            font-size: 0.95rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #7a5c48;
+        }
+        .signpost::after { /* 告示牌木棍 */
+            content: "";
+            position: absolute;
+            top: 100%; left: 50%;
+            width: 12px; height: 30px;
+            background: #7a5c48;
+            transform: translateX(-50%);
+        }
+
+        /* --- 儲水瓶 --- */
+        .jar-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            text-align: center;
+        }
+        .glass-jar {
+            width: 60px;
+            height: 80px;
+            background: rgba(255,255,255,0.6);
+            border: 3px solid #eee;
+            border-radius: 10px 10px 25px 25px;
+            position: relative;
+            margin: 0 auto;
             overflow: hidden;
         }
-
         .water {
             position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: linear-gradient(to top, var(--water-blue), #dff1ff);
-            transition: height 2s ease-in-out;
+            bottom: 0; width: 100%;
+            background: linear-gradient(to top, #a2d2ff, #caf0f8);
+            transition: height 2s ease;
         }
 
-        .progress-text { font-size: 14px; margin-bottom: 8px; font-weight: 300; }
-        .cash-status { font-size: 13px; letter-spacing: 1px; }
-        
-        .advice-box {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 20px;
-            background: #fffafa;
-            font-size: 14px;
-            border: 1px solid #f9f0f0;
-            line-height: 1.6;
-            color: #9a8c98;
+        .stats-text {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            color: #888;
         }
 
-        #status-msg { font-size: 11px; color: #d1d1d1; margin-top: 15px; }
     </style>
 </head>
-<body>
+<body id="main-body">
 
 <div class="container">
-    <h1>🌲 LUMI'S FOREST 🌲</h1>
-    
-    <div class="progress-text" id="assets-label">連線中...</div>
-    <div class="forest-box" id="forest-display">🌱</div>
+    <h1 id="title">Lumi's Garden</h1>
+    <div class="stats-text" id="assets-display">正在同步森林狀態...</div>
 
-    <div class="pool-container">
+    <div class="forest-canvas" id="forest-canvas">
+        </div>
+
+    <div class="signpost" id="daily-advice">
+        請輸入密碼以讀取告示牌...
+    </div>
+</div>
+
+<div class="jar-container">
+    <div class="glass-jar">
         <div id="water-level" class="water" style="height: 0%;"></div>
     </div>
-    <div class="cash-status" id="cash-status">讀取儲水池...</div>
-
-    <div class="advice-box" id="daily-advice">正在接收市場頻率...</div>
-    <div id="status-msg"></div>
+    <div class="stats-text" style="font-size: 10px;" id="cash-label">剩餘水位</div>
 </div>
 
 <script>
-    // 🔐 配置區
-    const MY_PASSWORD = "lumi080601"; // <-- 請修改密碼
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnKIlc9Lf9PxSlb83nV1Wny7fC0EhKpy9iR41mMRqnLDepRpWwz8qyiIWaDEjY0TWaGLROfzeKbHG/pub?gid=768557640&single=true&output=csv"; // <-- 請修改網址，務必保留雙引號
+    // --- 密碼與設定 ---
+    const MY_PASSWORD = "lumi2026"; 
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnKIlc9Lf9PxSlb83nV1Wny7fC0EhKpy9iR41mMRqnLDepRpWwz8qyiIWaDEjY0TWaGLROfzeKbHG/pub?gid=768557640&single=true&output=csv"; 
+
+    // --- 插畫元件 (SVG) ---
+    const bigTreeSVG = `<svg class="tree-icon" width="60" height="60" viewBox="0 0 100 100"><path d="M50 10 L80 70 L20 70 Z" fill="#a8d5ba"/><path d="M50 25 L70 70 L30 70 Z" fill="#8ecba3"/><rect x="45" y="70" width="10" height="20" fill="#967259"/></svg>`;
+    const sproutSVG = `<svg class="sprout-icon" width="30" height="30" viewBox="0 0 100 100"><path d="M50 80 Q50 40 80 40 Q50 50 50 80" fill="#d8e2dc"/><path d="M50 80 Q50 40 20 40 Q50 50 50 80" fill="#a8d5ba"/></svg>`;
 
     function checkAuth() {
-        const userInput = prompt("請輸入通往 Lumi 森林的密碼：");
+        const userInput = prompt("請輸入密碼開啟 Lumi 的繪本森林：");
         if (userInput === MY_PASSWORD) {
             document.body.style.visibility = "visible";
             fetchData();
         } else {
-            alert("密碼錯誤，請重新整理網頁。");
-            document.body.innerHTML = "<h2 style='text-align:center;color:#bbb;margin-top:50px;'>🔒 私密森林</h2>";
-            document.body.style.visibility = "visible";
+            alert("密碼錯誤");
+            window.location.reload();
         }
     }
 
-async function fetchData() {
+    async function fetchData() {
         try {
             const response = await fetch(csvUrl + "&t=" + new Date().getTime());
-            if (!response.ok) throw new Error("Fetch Failed");
-            
             const rawData = await response.text();
-            const rows = rawData.split(/\r?\n/).map(row => 
-                row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim())
-            );
-
-            // 🌟 強力過濾器：先把所有逗號拔掉，再轉成數字
-            const cleanNum = (val) => {
-                if (!val) return 0;
-                // 先把逗號拔除，再過濾掉非數字字符
-                const simpleStr = String(val).replace(/,/g, ''); 
-                const n = parseFloat(simpleStr.replace(/[^\d.-]/g, ''));
-                return isNaN(n) ? 0 : n;
+            const rows = rawData.split(/\r?\n/).map(row => row.split(',').map(c => c.replace(/["]+/g, '').trim()));
+            
+            const parseNum = (v) => parseFloat(String(v).replace(/[^\d.-]/g, '')) || 0;
+            const data = {
+                assets: parseNum(rows[0][1]),
+                goal: parseNum(rows[1][1]),
+                cash: parseNum(rows[2][1]),
+                monthly: parseNum(rows[3][1]),
+                advice: rows[4][1],
+                light: rows[5][1]
             };
 
-            const assets = cleanNum(rows[0][1]);
-            const goal = cleanNum(rows[1][1]);
-            const cash = cleanNum(rows[2][1]);
-            const monthly = cleanNum(rows[3][1]);
-            const advice = rows[4][1] || "持續前進中";
-
-            render(assets, goal, cash, monthly, advice);
+            updateUI(data);
         } catch (e) {
-            document.getElementById('status-msg').innerText = "數據讀取失敗，請確認 Google Sheets 已發布。";
+            document.getElementById('daily-advice').innerText = "森林暫時斷開連結了...";
         }
     }
 
-    function render(assets, goal, cash, monthly, advice) {
-        const percent = goal > 0 ? ((assets / goal) * 100).toFixed(1) : 0;
-        document.getElementById('assets-label').innerText = `成長進度：${percent}% (累積價值 ${assets.toLocaleString()} 元)`;
+    function updateUI(data) {
+        // 1. 更新燈號與背景色
+        document.body.className = `light-${data.light}`;
         
-        const trees = Math.floor(assets / 100000); 
-        const sprouts = Math.floor((assets % 100000) / 10000); 
-        document.getElementById('forest-display').innerText = "🌲".repeat(trees) + "🌱".repeat(sprouts);
+        // 2. 更新告示牌與進度
+        const percent = ((data.assets / data.goal) * 100).toFixed(1);
+        document.getElementById('assets-display').innerText = `目前進度 ${percent}% ｜ 資產價值 ${data.assets.toLocaleString()} 元`;
+        document.getElementById('daily-advice').innerText = data.advice;
 
-        const months = monthly > 0 ? (cash / monthly).toFixed(1) : 0;
-        const waterHeight = Math.min((months / 6) * 100, 100);
-        document.getElementById('water-level').style.height = waterHeight + "%";
-        
-        document.getElementById('cash-status').innerText = `池內餘額可支持約 ${months} 個月`;
-        document.getElementById('daily-advice').innerText = "📝 指引：" + advice;
-        document.getElementById('status-msg').innerText = "最後更新: " + new Date().toLocaleTimeString();
+        // 3. 繪製隨機森林
+        const canvas = document.getElementById('forest-canvas');
+        canvas.innerHTML = '';
+        const treeCount = Math.floor(data.assets / 100000);
+        const sproutCount = Math.floor((data.assets % 100000) / 10000);
+
+        // 隨機放置函數
+        const plant = (svg, count) => {
+            for (let i = 0; i < count; i++) {
+                const div = document.createElement('div');
+                div.innerHTML = svg;
+                const el = div.firstChild;
+                el.style.left = Math.random() * 85 + '%';
+                el.style.top = (Math.random() * 60 + 20) + '%';
+                el.style.transform = `scale(${0.8 + Math.random() * 0.5}) rotate(${Math.random() * 10 - 5}deg)`;
+                canvas.appendChild(el);
+            }
+        };
+        plant(bigTreeSVG, treeCount);
+        plant(sproutSVG, sproutCount);
+
+        // 4. 更新水池
+        const waterHeight = Math.min(((data.cash / data.monthly) / 6) * 100, 100);
+        document.getElementById('water-level').style.height = waterHeight + '%';
+        document.getElementById('cash-label').innerText = (data.cash / data.monthly).toFixed(1) + "個月餘額";
     }
 
     checkAuth();
@@ -176,4 +238,3 @@ async function fetchData() {
 
 </body>
 </html>
-
