@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumi's Asset Forest</title>
-    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --text-color: #2f3e35;
+            --label-bg: rgba(255,255,255,0.9);
         }
 
         body {
@@ -19,6 +20,7 @@
             background-repeat: no-repeat;
             transition: background-image 2s ease-in-out;
             visibility: hidden; /* 密碼輸入前隱藏 */
+            overflow-x: hidden; /* 防止水平捲軸 */
         }
 
         /* 疊加一層淡淡的紙張紋理感 */
@@ -28,68 +30,94 @@
             opacity: 0.2; pointer-events: none; z-index: -1;
         }
 
-        .container { width: 95%; max-width: 1200px; text-align: center; position: relative; }
+        .container { width: 100%; max-width: 1400px; text-align: center; position: relative; padding-bottom: 50px;}
 
         /* 書法標題 */
         h1 {
             font-family: 'ZCOOL XiaoWei', serif;
-            font-size: 4.5rem; margin: 0; letter-spacing: 12px;
+            font-size: 5rem; margin: 20px 0 0 0; letter-spacing: 15px;
             color: var(--text-color);
-            text-shadow: 2px 2px 8px rgba(255,255,255,0.8);
+            text-shadow: 3px 3px 10px rgba(255,255,255,0.9);
         }
 
-        .progress-bar-text { font-size: 14px; opacity: 0.7; margin-bottom: 20px; font-weight: 500; }
+        .progress-bar-text { font-size: 16px; opacity: 0.8; margin-bottom: 40px; font-weight: 700; color: #4a5d50; }
 
         /* --- 背景背景森林層 (與總進度連動) --- */
         .ambient-layer {
-            position: absolute; top: 150px; left: 0; width: 100%; height: 350px;
+            position: absolute; top: 200px; left: 0; width: 100%; height: 400px;
             z-index: 0; pointer-events: none;
             display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-end;
-            gap: 5px;
+            gap: 10px; padding: 0 20px;
         }
-        .progress-tree { transition: transform 0.5s ease; animation: sway 3s infinite ease-in-out; }
+        .progress-tree { transition: transform 0.5s ease; animation: sway 4s infinite ease-in-out; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1)); }
 
         /* --- 核心景觀區 (前景) --- */
         .landscape {
-            position: relative; z-index: 1; height: 500px;
+            position: relative; z-index: 1; min-height: 500px;
             display: flex; align-items: flex-end; justify-content: space-around;
-            padding: 0 50px;
+            padding: 0 5% 80px 5%; /* 增加底部 padding 讓樹木不要貼底 */
         }
 
         /* --- 噴水池 --- */
-        .fountain-unit { width: 250px; text-align: center; }
-        .fountain-img { width: 220px; height: auto; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); transition: all 1s ease; }
-        .cash-status { font-size: 13px; color: #507ba6; font-weight: bold; margin-top: 10px; background: rgba(255,255,255,0.6); padding: 2px 8px; border-radius: 10px; display: inline-block; }
+        .fountain-unit { width: 280px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .fountain-img { width: 260px; height: auto; filter: drop-shadow(0 15px 20px rgba(0,0,0,0.15)); transition: all 1s ease; }
+        /* 放大現金標籤 */
+        .cash-status {
+            font-size: 15px; color: #406b96; font-weight: 700; margin-top: 15px;
+            background: var(--label-bg); padding: 6px 16px; border-radius: 20px;
+            display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
 
         /* --- 果樹區 --- */
-        .orchard { flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; gap: 30px; }
+        .orchard { flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; gap: 40px; margin-left: 50px; }
         .tree-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; }
-        .tree-wrapper:nth-child(even) { margin-bottom: 40px; } /* 交錯排列防止標籤撞到 */
+        /* 交錯排列防止標籤撞到 */
+        .tree-wrapper:nth-child(even) { margin-bottom: 60px; } 
 
-        .tree-img { filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)); transition: transform 0.3s ease; }
-        .tree-img:hover { transform: scale(1.05); }
+        .tree-img { filter: drop-shadow(0 20px 30px rgba(0,0,0,0.2)); transition: transform 0.3s ease; cursor: pointer;}
+        .tree-img:hover { transform: scale(1.08); }
 
+        /* 放大股票標籤 */
         .stock-label {
-            background: rgba(255,255,255,0.85); padding: 6px 15px; border-radius: 20px;
-            font-size: 11px; border: 1px solid #eee; margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); white-space: nowrap;
+            background: var(--label-bg); padding: 8px 18px; border-radius: 25px;
+            font-size: 13px; border: 2px solid #fff; margin-top: 12px; font-weight: 700;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08); white-space: nowrap; color: #5a5a5a;
         }
-        .fertilize-tag { color: #d62828; font-weight: bold; margin-left: 5px; animation: blink 1s infinite; }
+        .fertilize-tag { color: #d62828; font-weight: 900; margin-left: 5px; animation: blink 1.2s infinite; }
 
-        /* --- 告示牌 --- */
-        .signpost-area { margin-top: 40px; display: flex; justify-content: center; }
+        /* --- 告示牌 (修正對位與放大) --- */
+        .signpost-area {
+            margin-top: -20px; /* 稍微向上拉一點，蓋住草地邊緣 */
+            display: flex; justify-content: center; position: relative; z-index: 2;
+        }
         .signboard {
-            width: 500px; height: 160px;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
+            width: 700px; /* 加寬 */
+            height: 240px; /* 加高 */
+            background-size: 100% 100%; background-repeat: no-repeat; background-position: center top;
             display: flex; justify-content: center; align-items: center;
-            padding: 0 60px 20px 60px; /* 根據插畫調整文字位置 */
-            box-sizing: border-box;
+            /* 關鍵修改：調整 Padding 以對位文字 */
+            /* 上:85px 把文字推到木頭處, 左右:90px 留邊, 下:50px 避開草地 */
+            padding: 85px 90px 50px 90px; 
+            box-sizing: border-box; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
         }
-        .advice-text { color: #fff; font-size: 1.2rem; line-height: 1.5; font-weight: 500; text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+        .advice-text {
+            color: #fff; font-size: 1.5rem; /* 放大文字 */
+            line-height: 1.6; font-weight: 700; text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            width: 100%;
+        }
 
-        @keyframes sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
+        /* RWD 調整：小螢幕時縮小標題和間距 */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; letter-spacing: 5px; }
+            .landscape { flex-direction: column; align-items: center; padding-bottom: 20px; }
+            .orchard { margin-left: 0; margin-top: 50px; gap: 20px; flex-wrap: wrap; }
+            .signboard { width: 95%; height: auto; padding: 60px 40px 40px 40px; background-size: 100% 100%; }
+            .advice-text { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
@@ -135,6 +163,7 @@
             "https://raw.githubusercontent.com/evannyc/lumiinve/main/assets/fountain/fountain_2_mid.png",
             "https://raw.githubusercontent.com/evannyc/lumiinve/main/assets/fountain/fountain_3_high.png"
         ],
+        // 這裡請確認你 GitHub 上是否有這些檔案，若無，它們會自動隱藏不顯示破圖
         progress_trees: {
             s: "https://raw.githubusercontent.com/evannyc/lumiinve/main/assets/trees/tree_progress_s.png",
             m: "https://raw.githubusercontent.com/evannyc/lumiinve/main/assets/trees/tree_progress_m.png",
@@ -180,7 +209,8 @@
 
     function render(d) {
         // 1. 背景與告示牌圖案
-        document.body.style.backgroundImage = `url('${ASSETS.backgrounds[d.light] || ASSETS.backgrounds["綠燈"]}')`;
+        const bgUrl = ASSETS.backgrounds[d.light] || ASSETS.backgrounds["綠燈"];
+        document.body.style.backgroundImage = `url('${bgUrl}')`;
         document.getElementById('signboard').style.backgroundImage = `url('${ASSETS.signpost}')`;
         document.getElementById('advice-text').innerText = d.advice;
 
@@ -188,16 +218,19 @@
         const progressPercent = (d.assets / d.goal) * 100;
         document.getElementById('progress-text').innerText = `Progress: ${progressPercent.toFixed(1)}% | Current Assets: $${d.assets.toLocaleString()}`;
 
-        // 背景小樹 (根據進度決定階段與數量)
+        // 背景小樹 (加入防破圖機制)
         const bgLayer = document.getElementById('ambient-layer');
         bgLayer.innerHTML = '';
         const treeType = progressPercent < 33 ? 's' : (progressPercent < 66 ? 'm' : 'l');
-        const count = Math.min(Math.floor(progressPercent * 1.2), 100); 
+        // 稍微減少數量以免太擁擠
+        const count = Math.min(Math.floor(progressPercent * 0.8), 60); 
         for(let i=0; i<count; i++) {
             const img = document.createElement('img');
             img.src = ASSETS.progress_trees[treeType];
             img.className = 'progress-tree';
-            img.style.width = (30 + Math.random() * 40) + 'px';
+            // 關鍵修復：如果圖片載入失敗，直接隱藏，避免破圖示
+            img.onerror = function() { this.style.display = 'none'; };
+            img.style.width = (40 + Math.random() * 50) + 'px'; // 稍微加大尺寸
             bgLayer.appendChild(img);
         }
 
@@ -210,7 +243,7 @@
         document.getElementById('fountain-img').src = ASSETS.fountains[fLevel];
         document.getElementById('cash-status').innerText = `現金支應：${months.toFixed(1)} 個月`;
 
-        // 4. 前景果樹：依據 CSV 設定的 Type 與 市值比例
+        // 4. 前景果樹
         const orchard = document.getElementById('orchard');
         orchard.innerHTML = '';
         const coreTypes = ['apple', 'orange', 'peach', 'banana'];
@@ -218,8 +251,8 @@
         d.stocks.forEach(s => {
             const type = coreTypes.includes(s.type) ? s.type : 'bush';
             const imgUrl = ASSETS.stocks[type];
-            // 樹的大小基礎 (120px) + 市值權重增額 (最高 300px)
-            const size = 120 + (s.val / d.assets) * 300;
+            // 調整樹木基礎大小與成長幅度
+            const size = 150 + (s.val / d.assets) * 350;
 
             const unit = document.createElement('div');
             unit.className = 'tree-wrapper';
@@ -238,4 +271,3 @@
 </script>
 </body>
 </html>
-
