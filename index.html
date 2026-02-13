@@ -123,9 +123,8 @@
         }
     }
 
-    async function fetchData() {
+async function fetchData() {
         try {
-            // 避免快取問題，在網址後加上時間戳記
             const response = await fetch(csvUrl + "&t=" + new Date().getTime());
             if (!response.ok) throw new Error("Fetch Failed");
             
@@ -134,9 +133,12 @@
                 row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim())
             );
 
-            // 數值清洗：移除所有非數字字符（除了小數點）
+            // 🌟 強力過濾器：先把所有逗號拔掉，再轉成數字
             const cleanNum = (val) => {
-                const n = parseFloat(String(val).replace(/[^\d.-]/g, ''));
+                if (!val) return 0;
+                // 先把逗號拔除，再過濾掉非數字字符
+                const simpleStr = String(val).replace(/,/g, ''); 
+                const n = parseFloat(simpleStr.replace(/[^\d.-]/g, ''));
                 return isNaN(n) ? 0 : n;
             };
 
@@ -174,3 +176,4 @@
 
 </body>
 </html>
+
