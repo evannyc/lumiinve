@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumi 的成長森林導航儀</title>
+    <style>
+        :root {
+            --bg-color: #fdfaf5; /* 奶油水彩底色 */
+            --forest-green: #cdeac0; /* 嫩草綠 */
+            --water-blue: #bde0fe; /* 淺天藍 */
+            --accent-pink: #ffcad4; /* 櫻花粉 */
+            --text-color: #8b8589; /* 暖灰色 */
+        }
+
+        body {
+            font-family: "Hiragino Sans GB", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            /* 防止在未輸入密碼前看到內容 */
+            visibility: hidden; 
+        }
+
+        .container {
+            width: 90%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px 25px;
+            border-radius: 45px;
+            box-shadow: 0 20px 40px rgba(220, 210, 200, 0.3);
+            text-align: center;
+            border: 2px solid #ffffff;
+        }
+
+        h1 { color: var(--accent-pink); font-size: 20px; letter-spacing: 3px; margin-bottom: 30px; }
+
+        .forest-box {
+            background: #f8fbf9;
+            padding: 35px 15px;
+            border-radius: 30px;
+            margin: 20px 0;
+            min-height: 130px;
+            font-size: 42px;
+            line-height: 1.6;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #e8f3ee;
+        }
+
+        .pool-container {
+            width: 70px;
+            height: 110px;
+            border: 3px solid #f0f0f0;
+            border-radius: 12px 12px 35px 35px;
+            margin: 20px auto;
+            position: relative;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        .water {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, var(--water-blue), #dff1ff);
+            transition: height 2s ease-in-out;
+        }
+
+        .progress-text { font-size: 14px; margin-bottom: 8px; font-weight: 300; }
+        .cash-status { font-size: 13px; letter-spacing: 1px; }
+        
+        .advice-box {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 20px;
+            background: #fffafa;
+            font-size: 14px;
+            border: 1px solid #f9f0f0;
+            line-height: 1.6;
+            color: #9a8c98;
+        }
+
+        #status-msg { font-size: 11px; color: #d1d1d1; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-content">
+    <h1>🌲 LUMI'S FOREST 🌲</h1>
+    
+    <div class="progress-text" id="assets-label">數據連線中...</div>
+    <div class="forest-box" id="forest-display">🌱</div>
+
+    <div class="pool-container">
+        <div id="water-level" class="water" style="height: 0%;"></div>
+    </div>
+    <div class="cash-status" id="cash-status">讀取儲水池水位...</div>
+
+    <div class="advice-box" id="daily-advice">正在接收市場頻率...</div>
+    <div id="status-msg"></div>
+</div>
+
+<script>
+    /**
+     * 🔐 密碼與設定
+     */
+    const MY_PASSWORD = "lumi2026"; // 您可以修改這裡的密碼
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnKIlc9Lf9PxSlb83nV1Wny7fC0EhKpy9iR41mMRqnLDepRpWwz8qyiIWaDEjY0TWaGLROfzeKbHG/pub?gid=768557640&single=true&output=csv";
+
+    // 啟動流程
+    function startApp() {
+        const userInput = prompt("請輸入通往 Lumi 森林的密碼：");
+        
+        if (userInput === MY_PASSWORD) {
+            // 驗證成功，顯示內容並抓取數據
+            document.body.style.visibility = "visible";
+            fetchData();
+        } else {
+            // 驗證失敗
+            alert("密碼不正確，請重新整理網頁後重試。");
+            document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px; color:#bbb;'>🔒 這裡是私密的成長森林</h2>";
+            document.body.style.visibility = "visible";
+        }
+    }
+
+    async function fetchData() {
+        try {
+            const response = await fetch(csvUrl);
+            if (!response.ok) throw new Error("Connection Error");
+            
+            const rawData = await response.text();
+            const rows = rawData.split(/\r?\n/).map(row => 
+                row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim())
+            );
+
+            const assets = parseFloat(rows[0][1].replace(/,/g, ''));
+            const goal = parseFloat(rows[1][1].replace(/,/g, ''));
+            const cash = parseFloat(rows[2][1].replace(/,/g, ''));
+            const monthly = parseFloat(rows[3][1].replace(/,/g, ''));
+            const advice = rows[4][1];
+
+            render(assets, goal, cash, monthly, advice);
+            document.getElementById('status-msg').innerText = "Last update: " + new Date().toLocaleTimeString();
+        } catch (e) {
+            document.getElementById('status-msg').innerText = "連線失敗，請檢查資料源。";
+        }
+    }
+
+    function render(assets, goal, cash, monthly, advice) {
+        const percent = ((assets / goal) * 100).toFixed(1);
+        document.getElementById('assets-label').innerText = `成長進度：${percent}% (累積價值 ${assets.toLocaleString()} 元)`;
+        
+        const trees = Math.floor(assets / 100000); 
+        const sprouts = Math.floor((assets % 100000) / 10000); 
+        document.getElementById('forest-display').innerText = "🌲".repeat(trees) + "🌱".repeat(sprouts);
+
+        const months = (cash / monthly).toFixed(1);
+        const waterHeight = Math.min((months / 6) * 100, 100);
+        document.getElementById('water-level').style.height = waterHeight + "%";
+        
+        let cashLabel = `池內餘額可支持約 ${months} 個月`;
+        if (months < 2) cashLabel = "💧 儲水警告：需要補給";
+        document.getElementById('cash-status').innerText = cashLabel;
+
+        document.getElementById('daily-advice').innerText = "📝 指引：" + advice;
+    }
+
+    // 執行初始化
+    startApp();
+</script>
+
+</body>
+</html>
